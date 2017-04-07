@@ -1,0 +1,158 @@
+#!/bin/bash
+# Assignment 1
+# Course:                DPS918
+# Family Name:           Wong
+# Given Name:            William
+# Student Number:        018-369-033
+# Login name:            wwong20
+# Professor:             Les Czegel
+# Due Date:              March 17, 2017
+#
+# I declare that the attached assignment is my own work in accordance with
+# Seneca Academic Policy.  No part of this assignment has been copied manually
+# or electronically from any other source (including web sites) or distributed
+# to other students.
+
+if [[ $# == 0 || $# == 1 ]]
+then
+	userinput=""
+
+	if [ $# == 0 ]
+	then	
+		userinput=$(echo ".")
+	else
+		userinput=$1
+	fi
+
+	if [ ! -e $userinput ]
+	then
+		echo "$1 is not a valid filename" >&2
+		exit 1
+	else
+		clear
+                printf "  Owner   Group   Other   Filename\n"
+                printf "  -----   -----   -----   --------\n\n"
+	
+		arraymaxcount=0
+		arraycount=0
+		declare -a linksarray
+		declare -a ownerarray
+		declare -a grouparray
+		declare -a sizearray
+		declare -a modifiedarray
+
+		linecount=1	
+		currentlevel=""
+		absolutepath=$(readlink -f $userinput)
+
+		echo -n "d "
+                echo -n "$(ls -ld / | awk '{print $1}' | sed 's/^.//' | sed 's/.\{3\}/& /g' | sed 's/./& /g')"
+		printf "/\n\n"
+
+		linksarray[arraycount]=$(ls -ld / | cut -d' ' -f2)
+		ownerarray[arraycount]=$(ls -ld / | cut -d' ' -f3)
+		grouparray[arraycount]=$(ls -ld / | cut -d' ' -f4)
+		sizearray[arraycount]=$(ls -ld / | cut -d' ' -f5)
+		modifiedarray[arraycount]=$(date -r / | awk '{print $2, $3, $6}')
+		((arraycount++))
+		((arraymaxcount++))
+					
+        	for files in $(echo $absolutepath | tr "/" " ")
+        	do
+			((linecount++))
+                	currentlevel=$(echo "$currentlevel/$files")
+
+                	if [ -d "$currentlevel" ]
+                	then
+	                	echo -n "d "
+			else
+	                	echo -n "- "
+			fi
+
+        		echo -n "$(ls -ld $currentlevel | awk '{print $1}' | sed 's/^.//' | sed 's/.\{3\}/& /g' | sed 's/./& /g')"
+                	echo $files
+        		echo ""
+
+
+			linksarray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f2)
+			ownerarray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f3)		
+			grouparray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f4)
+			sizearray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f5)
+			modifiedarray[arraycount]=$(date -r $currentlevel | awk '{print $2, $3, $6}')
+			((arraycount++))
+			((arraymaxcount++))
+		done
+
+		((arraymaxcount--))
+		((arraycount--))
+		linecountcursor=$(( (linecount * 2) + 1 ))
+		linecountdisplay=$(( (linecount * 2) + 2 ))
+		linecountbottom=$linecountdisplay
+
+		columns=$(tput cols)
+		rows=$(tput lines)
+		newrows=$(( $rows - 1 ))
+	
+		tput cup $newrows 0
+		printf "Valid commands:   u(p)   d(own)   q(uit)"
+
+		oldsettings=$(stty -g)
+		stty -icanon min 1 time 0
+		key=
+		
+		while [ "$key" != "q" ]
+		do
+			tput cup $linecountdisplay 2
+			printf "Links: %s  Owner: %s  Group: %s  Size: %s  Modified: %s" "${linksarray[arraycount]}" "${ownerarray[arraycount]}" "${grouparray[arraycount]}" "${sizearray[arraycount]}" "${modifiedarray[arraycount]}"
+
+			tput cup $linecountcursor 26
+   			echo -n ""
+			stty -echo
+   			key=$(dd bs=1 count=1 2> /dev/null)
+			stty echo
+
+			if [[ "$key" == "u" && $linecountdisplay -gt 4 ]]
+			then
+				tput cup $linecountdisplay 2
+				tput el
+				
+				linecountcursor=$(( linecountcursor - 2 ))
+				linecountdisplay=$(( linecountdisplay - 2 ))
+				
+				if [[ $arraycount -gt 0 ]]
+				then
+					((arraycount--))
+				fi 
+			fi
+
+			if [[ "$key" == "d" && $linecountdisplay -lt $linecountbottom ]]
+			then
+				tput cup $linecountdisplay 2
+				tput el
+				
+				linecountcursor=$(( linecountcursor + 2 ))
+				linecountdisplay=$(( linecountdisplay + 2))
+
+				if [[ $arraycount -lt $arraymaxcount ]]
+				then
+					((arraycount++))
+				fi
+			fi
+		done
+		
+		stty $oldsettings
+		
+		if [ $? != 0 ]
+		then
+			clear
+			exit 1
+		else
+			clear
+			exit 0
+		fi
+	fi
+else
+	echo "Usage: showpath [ filename ]" >&2
+	exit 1
+fi
+
