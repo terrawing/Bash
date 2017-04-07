@@ -1,0 +1,365 @@
+#!/bin/bash
+# Assignment 2
+# Course:                DPS918
+# Family Name:           Wong
+# Given Name:            William
+# Student Number:        018-369-033
+# Login name:            wwong20
+# Professor:             Les Czegel
+# Due Date:              April 7, 2017
+#
+# I declare that the attached assignment is my own work in accordance with
+# Seneca Academic Policy.  No part of this assignment has been copied manually
+# or electronically from any other source (including web sites) or distributed
+# to other students.
+
+if [[ $# == 0 || $# == 1 ]]
+then
+	userinput=""
+
+	if [ $# == 0 ]
+	then	
+		userinput=$(echo ".")
+	else
+		userinput=$1
+	fi
+
+	if [ ! -e $userinput ]
+	then
+		echo "$1 is not a valid filename" >&2
+		exit 1
+	else
+		clear
+                printf "  Owner   Group   Other   Filename\n"
+                printf "  -----   -----   -----   --------\n\n"
+	
+		arraymaxcount=0
+		arraycount=0
+		declare -a linksarray
+		declare -a ownerarray
+		declare -a grouparray
+		declare -a sizearray
+		declare -a modifiedarray
+		declare -a filepathnamesarray
+		screenlength=$(tput cols)
+
+		linecount=1	
+		currentlevel=""
+		absolutepath=$(readlink -f $userinput)
+
+		echo -n "d "
+                echo -n "$(ls -ld / | awk '{print $1}' | sed 's/^.//' | sed 's/.\{3\}/& /g' | sed 's/./& /g')"
+		printf "/\n\n"
+
+		linksarray[arraycount]=$(ls -ld / | cut -d' ' -f2)
+		ownerarray[arraycount]=$(ls -ld / | cut -d' ' -f3)
+		grouparray[arraycount]=$(ls -ld / | cut -d' ' -f4)
+		sizearray[arraycount]=$(ls -ld / | cut -d' ' -f5)
+		modifiedarray[arraycount]=$(date -r / | awk '{print $2, $3, $6}')
+		filepathnamesarray[arraycount]=/
+		((arraycount++))
+		((arraymaxcount++))
+					
+        	for files in $(echo $absolutepath | tr "/" " ")
+        	do
+			((linecount++))
+                	currentlevel=$(echo "$currentlevel/$files")
+
+                	if [ -d "$currentlevel" ]
+                	then
+	                	echo -n "d "
+			else
+	                	echo -n "- "
+			fi
+
+        		echo -n "$(ls -ld $currentlevel | awk '{print $1}' | sed 's/^.//' | sed 's/.\{3\}/& /g' | sed 's/./& /g')"
+                	echo $files | cut -c -$(( screenlength - 26 ))
+        		echo ""
+
+
+			linksarray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f2)
+			ownerarray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f3)		
+			grouparray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f4)
+			sizearray[arraycount]=$(ls -ld $currentlevel | cut -d' ' -f5)
+			modifiedarray[arraycount]=$(date -r $currentlevel | awk '{print $2, $3, $6}')
+			filepathnamesarray[arraycount]=$currentlevel
+			((arraycount++))
+			((arraymaxcount++))
+		done
+
+		((arraymaxcount--))
+		((arraycount--))
+		linecountcursor=$(( (linecount * 2) + 1 ))
+		linecountdisplay=$(( (linecount * 2) + 2 ))
+		linecountbottom=$linecountdisplay
+
+		horzcurpos=26
+		mincurpos=2
+		maxcurpos=26
+
+		rows=$(tput lines)
+		newrows=$(( $rows - 4 ))
+	
+		tput cup $newrows 0
+		printf "Valid keys: k (up), j (down): move between filenames\n"
+		printf "	    h (left), l (right): move between permissions\n"
+		printf "	    r, w, x, -: change permissions;   q: quit"
+
+		oldsettings=$(stty -g)
+		stty -icanon min 1 time 0
+		key=
+		printline=""
+		
+		while [ "$key" != "q" ]
+		do
+			trap "tput cup $rows 0; stty echo; exit;" SIGINT SIGTERM
+			
+			tput cup $linecountdisplay 2
+			printline=$(printf "Links: %s  Owner: %s  Group: %s  Size: %s  Modified: %s" "${linksarray[arraycount]}" "${ownerarray[arraycount]}" "${grouparray[arraycount]}" "${sizearray[arraycount]}" "${modifiedarray[arraycount]}")
+			echo "$printline" | cut -c -$(( screenlength - 2 ))
+
+			tput cup $linecountcursor $horzcurpos
+   			echo -n ""
+			stty -echo
+   			key=$(dd bs=1 count=1 2> /dev/null)
+			stty echo
+
+			if [[ "$key" == "k" && $linecountdisplay -gt 4 ]]
+			then
+				tput cup $linecountdisplay 2
+				tput el
+				
+				linecountcursor=$(( linecountcursor - 2 ))
+				linecountdisplay=$(( linecountdisplay - 2 ))
+				
+				if [[ $arraycount -gt 0 ]]
+				then
+					((arraycount--))
+				fi 
+			fi
+
+			if [[ "$key" == "j" && $linecountdisplay -lt $linecountbottom ]]
+			then
+				tput cup $linecountdisplay 2
+				tput el
+				
+				linecountcursor=$(( linecountcursor + 2 ))
+				linecountdisplay=$(( linecountdisplay + 2))
+
+				if [[ $arraycount -lt $arraymaxcount ]]
+				then
+					((arraycount++))
+				fi
+			fi
+
+			if [[ "$key" == "h" && $horzcurpos -gt $mincurpos ]]
+			then
+				if [[ $horzcurpos == 26 ]]
+                                then
+                                        horzcurpos=22
+                                elif [[ $horzcurpos == 18 ]]
+                                then
+                                        horzcurpos=14
+                                elif [[ $horzcurpos == 10 ]]
+				then
+					horzcurpos=6
+				else
+					horzcurpos=$(( horzcurpos - 2 ))
+				fi
+			fi
+
+			if [[ "$key" == "l" && $horzcurpos -lt $maxcurpos ]] 
+			then
+				if [[ $horzcurpos == 6 ]]
+				then
+					horzcurpos=10
+				elif [[ $horzcurpos == 14 ]]
+				then
+					horzcurpos=18
+				elif [[ $horzcurpos == 22 ]]
+				then
+					horzcurpos=26
+				else
+					horzcurpos=$(( horzcurpos + 2 ))
+				fi
+			fi
+
+			if [[ "$key" == [rwx-] && $horzcurpos -ne $maxcurpos ]]
+			then
+				if [[ $horzcurpos -gt 17 && $horzcurpos -lt 23 ]]
+				then
+					case $key in
+					r)
+						if [[ $horzcurpos == 18 ]]
+						then
+							chmod o+r ${filepathnamesarray[arraycount]} 2> /dev/null
+							if [ $? = 0 ]
+							then
+								echo "r"
+							fi
+						fi
+						;;	
+					w)	
+						if [[ $horzcurpos == 20 ]]
+						then
+							chmod o+w ${filepathnamesarray[arraycount]} 2> /dev/null
+							if [ $? = 0 ]
+							then
+								echo "w"
+							fi
+						fi
+						;;
+					x)
+						if [[ $horzcurpos == 22 ]]
+						then
+							chmod o+x ${filepathnamesarray[arraycount]} 2> /dev/null
+							if [ $? = 0 ]
+							then
+								echo "x"
+							fi
+						fi
+						;;
+					-)
+						if [[ $horzcurpos == 18 ]]
+						then
+							chmod o-r ${filepathnamesarray[arraycount]} 2> /dev/null
+						elif [[ $horzcurpos == 20 ]]
+						then
+							chmod o-w ${filepathnamesarray[arraycount]} 2> /dev/null
+						else
+							chmod o-x ${filepathnamesarray[arraycount]} 2> /dev/null
+						fi
+						
+						if [ $? = 0 ]
+						then
+							echo "-"
+						fi
+						;;
+					*)
+						;;
+					esac
+				elif [[ $horzcurpos -gt 9 && $horzcurpos -lt 15 ]]
+                                then
+                                        case $key in
+                                        r)
+                                                if [[ $horzcurpos == 10 ]]
+                                                then
+                                                        chmod g+r ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "r"
+                                                        fi
+                                                fi
+                                                ;;
+                                        w)
+                                                if [[ $horzcurpos == 12 ]]
+                                                then
+                                                        chmod g+w ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "w"
+                                                        fi
+                                                fi
+                                                ;;
+                                        x)
+                                                if [[ $horzcurpos == 14 ]]
+                                                then
+                                                        chmod g+x ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "x"
+                                                        fi
+                                                fi
+                                                ;;
+                                        -)
+                                                if [[ $horzcurpos == 10 ]]
+                                                then
+                                                        chmod g-r ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                elif [[ $horzcurpos == 12 ]]
+                                                then
+                                                        chmod g-w ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                else
+                                                        chmod g-x ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                fi
+
+                                                if [ $? = 0 ]
+                                                then
+                                                        echo "-"
+                                                fi
+                                                ;;
+                                        *)
+                                                ;;
+                                        esac
+                                else
+					case $key in
+                                        r)
+                                                if [[ $horzcurpos == 2 ]]
+                                                then
+                                                        chmod u+r ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "r"
+                                                        fi
+                                                fi
+                                                ;;
+                                        w)
+                                                if [[ $horzcurpos == 4 ]]
+                                                then
+                                                        chmod u+w ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "w"
+                                                        fi
+                                                fi
+                                                ;;
+                                        x)
+                                                if [[ $horzcurpos == 6 ]]
+                                                then
+                                                        chmod u+x ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                        if [ $? = 0 ]
+                                                        then
+                                                                echo "x"
+                                                        fi
+                                                fi
+                                                ;;
+                                        -)
+                                                if [[ $horzcurpos == 2 ]]
+                                                then
+                                                        chmod u-r ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                elif [[ $horzcurpos == 4 ]]
+                                                then
+                                                        chmod u-w ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                else
+                                                        chmod u-x ${filepathnamesarray[arraycount]} 2> /dev/null
+                                                fi
+
+                                                if [ $? = 0 ]
+                                                then
+                                                        echo "-"
+                                                fi
+                                                ;;
+                                        *)
+                                                ;;
+                                        esac
+				fi
+
+			fi
+			
+		done
+		
+		stty $oldsettings
+	
+		if [ $? != 0 ]
+		then
+			tput cup $rows 0
+			exit 1
+		else
+			tput cup $rows 0
+			exit 0
+		fi
+	fi
+else
+	echo "Usage: vchmod [ filename ]" >&2
+	exit 1
+fi
+
