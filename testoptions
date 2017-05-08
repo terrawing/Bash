@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ -e "$1" ]
+then
+	if [ -f "$1" ]
+	then
+		if [ -r "$1" ]
+		then
+			echo "File has read"
+		elif [ -w "$1" ]
+		then
+			echo "File has write"
+		else
+			echo "File has execute"
+		fi		
+	elif [ -d "$1" ]
+	then
+		if [ -x "$1" ]
+		then
+			echo "Directory has execute"
+		fi
+	fi
+else
+	echo "File does not even exist"
+fi

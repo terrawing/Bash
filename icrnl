@@ -1,0 +1,20 @@
+#!/bin/bash
+
+stty -icrnl -icanon min 0 time 0
+key=
+
+while [ "$key" != "q" ]
+do
+	echo -n "Enter a key: "
+	key=
+
+	while [ "$key" == "" ]
+	do
+		read -r key
+	done
+	echo -e "\nYou have entered $key"
+done
+
+stty icrnl icanon
+echo "YOu finall entered $key"
+

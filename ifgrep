@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if grep "$1" cars > /dev/null
+then
+	echo "$(grep "$1" cars 2> /dev/null)"
+fi

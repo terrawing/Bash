@@ -1,0 +1,10 @@
+#!/bin/bash
+
+select animal in $*
+do
+	echo "You have enter $animal"
+	if [ "$animal" == "q" ]
+	then 
+		break
+	fi
+done

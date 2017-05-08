@@ -1,0 +1,11 @@
+#!/bin/bash
+
+oldsettings=$(stty -g)
+echo "Enter password"
+stty -echo
+read password
+stty $oldsettings
+
+echo "You enter $password"
+
+

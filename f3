@@ -1,0 +1,15 @@
+#!/bin/bash
+
+localenv() {
+	local a=1 b=2
+	c=3
+	d=4
+
+	echo "These are inside: $a $b $c $d"
+}
+
+a=0; b=0; c=0; d=0; e=0
+localenv
+
+echo "These are outside: $a $b $c $d $e"
+

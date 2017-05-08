@@ -1,0 +1,12 @@
+#!/bin/bash
+
+oldsettings=$(stty -g)
+stty -icanon min 1 time 0
+key=
+while [ "$key" != "q" ]
+do
+   echo -n "Hit any key: "
+   key=$(dd bs=1 count=1 2> /dev/null)
+   echo -e "\nYou hit the \"$key\" key"
+done
+stty $oldsettings

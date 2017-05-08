@@ -1,0 +1,10 @@
+#!/bin/bash
+
+fifo=~/tmp/simplepipe
+rm $fifo 2> /dev/null
+mkfifo $fifo
+
+while read line
+do
+	echo $line
+done < $fifo

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+string=
+while [ "$string" != "q" ]
+do
+	clear
+	if [ "$string" != "" ]
+	then
+		tput cup 20 20
+		echo "You have entered: $string"
+	fi
+
+	tput cup 10 10
+	tput smso
+	echo -n "Enter a key: "
+	read string
+	tput rmso
+done
+clear
+tput cup 0 0
+exit 0
+

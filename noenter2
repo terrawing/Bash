@@ -1,0 +1,19 @@
+#!/bin/bash
+
+stty -icanon min 0 time 0
+key=
+
+while [ "$key" != "q" ]
+do
+	echo -n "Hit any key: "
+	key=
+	while [ "$key" == "" ]
+	do
+		read key
+	done
+
+	echo -e "\nYou have entered: $key"
+done
+stty icanon
+
+echo "Finally $key has been prressed"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+grep -i "$1" cars > /dev/null
+
+if [ $? = 0 ]
+then
+	echo "We have at least one $1 in inventory"
+else
+	echo "We have no $1 in inventory, sorry"
+fi
+

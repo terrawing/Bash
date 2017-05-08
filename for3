@@ -1,0 +1,14 @@
+#!/bin/bash
+
+for file
+do
+	if [ -f $file ]
+	then
+		echo "regular file"
+	elif [ -d $file ]
+	then
+		echo "directory"
+	else
+		echo "Doesn't exist"
+	fi
+done

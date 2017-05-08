@@ -1,0 +1,13 @@
+#!/bin/bash
+
+fifo=~/tmp/log_server_pipe
+
+if [[ ! -p $fifo ]]
+then
+	echo "Error: log server not running" >&2
+	exit 1
+fi
+
+printf "Please enter a command: "
+read line
+echo $line > $fifo

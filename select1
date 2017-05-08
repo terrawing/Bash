@@ -1,0 +1,7 @@
+#!/bin/bash
+
+select animal in $*
+do
+	echo "You have enter $animal"
+	break
+done

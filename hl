@@ -1,0 +1,33 @@
+#!/bin/bash
+
+
+echo -n "Enter the column: "
+read cols
+echo ""
+echo -n "Enter the row: "
+read rows
+echo ""
+echo "Default values are columns: $(tput cols) and rows: $(tput lines)"
+echo ""
+
+stty -icanon min 0 time 0
+key=
+while [ "$key" != "q" ]
+do
+	tput cup $rows $cols
+	tput smso
+	echo -n "Enter a key: "
+	key=
+	while [ "$key" == "" ]
+	do
+		read key
+	done
+	tput rmso
+	
+	tput cup $(($rows + 1)) $cols
+	echo -e "\nYou have entered: $key\n"
+done
+
+echo "You have finall pressed $key"
+stty icanon
+

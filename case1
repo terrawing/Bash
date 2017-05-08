@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo -n "Enter an animal: "
+read animal
+
+case $animal in
+lion)
+	echo "Lion"
+	;;
+tiger)
+	echo "Tiger"
+	;;
+bear)
+	echo "Bear"
+	;;
+*)
+	echo "Some other animal"
+	;;
+esac
+

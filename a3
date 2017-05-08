@@ -1,0 +1,12 @@
+#!/bin/bash
+
+declare -a somearray
+
+somearray[0]="William Wong"
+somearray[1]="Dill Pickles"
+somearray[1000]="Tommy Pickles"
+
+for people in "${somearray[@]}"
+do
+	echo "These are the peeople: $people"
+done

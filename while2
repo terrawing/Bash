@@ -1,0 +1,12 @@
+#!/bin/bash
+
+key=""
+while [ "$key" != "q" ]
+do
+	echo -n "Enter a key: "
+	read key
+ 
+	echo "This is what you entered: $key"
+done
+
+echo "Finall $key has been entered"

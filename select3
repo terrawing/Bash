@@ -1,0 +1,8 @@
+#!/bin/bash
+
+animals="lion tiger bear"
+select animal in $animals
+do
+	echo "This is the $animal"
+	break
+done

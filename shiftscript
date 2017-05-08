@@ -1,0 +1,11 @@
+#/bin/bash
+
+echo "This is your arguments: $*"
+echo -n "How many you want to shift? "
+read number
+
+shift $(echo $number)
+echo -e "This is the final arguments: $*\nWith this many number of arguments: $#"
+
+set new stuff
+echo "THis is the new arguments $* with number $#"

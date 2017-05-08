@@ -1,0 +1,7 @@
+#!/bin/bash
+
+fifo=~/tmp/simplepipe
+
+echo -n "Enter something: "
+read line
+echo $line > $fifo

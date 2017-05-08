@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#stuffarray=(stuff stuff2 "$USER")
+stuffarray=(stuff [10]=stuff2 [20]="My name is $USER")
+
+echo ${#stuffarray[*]}
+echo ${stuffarray[*]}
+echo ${!stuffarray[*]}

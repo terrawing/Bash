@@ -1,0 +1,14 @@
+#!/bin/bash
+
+while read line
+do
+	echo "$line"
+done < cars
+
+echo ""
+
+cat cars | 
+while read input
+do
+	echo "New lines: $input"
+done

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+[[ $1 -gt 0 ]] && [[ $1 -lt 25 ]] && echo "Number bw 0 and 25" || echo "meh"
+

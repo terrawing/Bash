@@ -1,0 +1,21 @@
+#!/bin/bash
+
+somearray=(50 william "stuff yo")
+
+echo ${somearray[*]}
+echo ${#somearray[*]}
+echo ${!somearray[*]}
+echo ""
+echo ${somearray[1]}
+echo ${somearray[-1]}
+echo ${somearray[-2]}
+echo ${somearray[-3]}
+echo ""
+
+for element in "${somearray[@]}"
+do
+	echo "These are the elements: $element"
+done
+
+
+

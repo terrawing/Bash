@@ -1,0 +1,14 @@
+#!/bin/bash
+
+fifo=~/tmp/log_server_pipe
+
+if [[ ! -p $fifo ]] && rm $fifo
+then
+	echo "Error: could not create pipe" >&2
+	exit 1
+fi
+
+while read line
+do
+	echo $line
+done < $fifo

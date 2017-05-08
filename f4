@@ -1,0 +1,14 @@
+#!/bin/bash
+
+echo $1 $2 $3 $4
+add() {
+	sum=0
+	for num
+	do
+		sum=$((sum + num))
+	done
+	echo $sum
+}
+
+xxx=$(add 50 67 98 -40)
+echo $xxx

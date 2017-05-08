@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [[ $1 = "-l" ]]
+then
+	echo "$(ls -l)"
+elif [[ $1 = "-d" ]]
+then
+	 echo "$(ls -d)"
+else
+ echo "nothing"
+fi
+

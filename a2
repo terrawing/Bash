@@ -1,0 +1,17 @@
+#!/bin/bash
+
+declare -a somearray
+
+somearray[0]="William Wong"
+somearray[1]="Dill Pickles"
+somearray[1000]="Tommy Pickles"
+
+echo ${somearray[1]}
+echo ${#somearray[@]}
+echo ${!somearray[@]}
+echo ""
+echo ${somearray[-1]}
+echo ${somearray[-1001]}
+echo ${somearray[-1002]}
+echo ${somearray[-2]}
+
